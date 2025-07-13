@@ -1,0 +1,30 @@
+streamlit
+python-dotenv
+requests
+openai
+streamlit-audio-recorder
+# Google OAuth & Calendar
+google-auth
+google-auth-oauthlib
+google-api-python-client
+
+# Gemini (Google Generative AI)
+google-genai
+
+# Whisper (Speech-to-Text)
+openai-whisper
+ffmpeg-python
+
+# ElevenLabs (Text-to-Speech)
+elevenlabs
+
+# Audio processing & playback
+pydub
+soundfile
+SpeechRecognition
+
+# Optional: Conversation memory or agent logic
+langchain-core
+
+# Dev convenience (optional)
+black
