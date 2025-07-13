@@ -1,0 +1,87 @@
+.env
+# Environments
+.env
+.env.*
+!.env.example # Keep .env.example if it exists
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json
+yarn.lock # if not using yarn v2+
+.pnpm-store/
+
+# Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+venv/
+.venv/
+env/
+.env/
+pip-log.txt
+pip-delete-this-directory.txt
+.Python
+.pytest_cache/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+build/
+.gradle/
+.idea/ # IntelliJ IDEA
+.project # Eclipse
+.classpath # Eclipse
+.settings/ # Eclipse
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.history/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Backup files
+*~
+*.bak
+*.swp
+*.swo
+.fuse_hidden*
+
+# Compiled output
+dist/
+build/
+out/
+
+# Other common ignores
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+*.dmg
+*.iso
+*.iml # IntelliJ IDEA module file
