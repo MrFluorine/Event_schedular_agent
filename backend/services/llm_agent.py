@@ -4,6 +4,7 @@ from google.genai import types
 from dotenv import load_dotenv
 from routes.calendar import find_free_slots, create_event
 
+
 load_dotenv()
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
