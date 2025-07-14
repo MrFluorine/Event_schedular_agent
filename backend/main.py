@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from routes.chat import router as chat_router
 from routes.calendar import router as calendar_router
 from routes.transcribe import router as transcribe_router
+from routes.auth import router as auth_router
 
 load_dotenv()
 
@@ -23,6 +24,7 @@ app.add_middleware(
 app.include_router(chat_router)
 app.include_router(calendar_router)
 app.include_router(transcribe_router)
+app.include_router(auth_router, prefix="/api")
 
 @app.get("/")
 def read_root():

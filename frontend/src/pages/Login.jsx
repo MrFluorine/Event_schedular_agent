@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react"; // Import useRef
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 if (!BACKEND_URL) {
   console.error("❌ VITE_BACKEND_URL is undefined!");

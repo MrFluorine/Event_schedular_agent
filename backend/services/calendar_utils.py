@@ -19,39 +19,43 @@ def format_slot(start_iso, end_iso, tz_str="Asia/Kolkata"):
     return f"{start_dt.strftime('%A %I:%M %p')} – {end_dt.strftime('%I:%M %p')}"
 
 def find_free_slots(access_token, duration_minutes=30, num_slots=5, timezone="Asia/Kolkata"):
-    service = get_calendar_service(access_token)
+    try:
+        service = get_calendar_service(access_token)
 
-    now = datetime.utcnow()
-    end = now + timedelta(days=7)  # look 1 week ahead
+        now = datetime.utcnow()
+        end = now + timedelta(days=7)  # look 1 week ahead
 
-    body = {
-        "timeMin": now.isoformat() + "Z",
-        "timeMax": end.isoformat() + "Z",
-        "items": [{"id": "primary"}],
-    }
+        body = {
+            "timeMin": now.isoformat() + "Z",
+            "timeMax": end.isoformat() + "Z",
+            "items": [{"id": "primary"}],
+        }
 
-    events_result = service.freebusy().query(body=body).execute()
-    busy_times = events_result["calendars"]["primary"]["busy"]
+        events_result = service.freebusy().query(body=body).execute()
+        busy_times = events_result["calendars"]["primary"]["busy"]
 
-    all_slots = []
-    slot_start = now.replace(minute=0, second=0, microsecond=0)
+        all_slots = []
+        slot_start = now.replace(minute=0, second=0, microsecond=0)
 
-    while slot_start < end and len(all_slots) < num_slots:
-        slot_end = slot_start + timedelta(minutes=duration_minutes)
-        overlap = any(
-            slot_start < datetime.fromisoformat(b["end"].replace("Z", "+00:00")) and
-            slot_end > datetime.fromisoformat(b["start"].replace("Z", "+00:00"))
-            for b in busy_times
-        )
-        if not overlap and 9 <= slot_start.hour < 18:
-            all_slots.append({
-                "start": slot_start.isoformat() + "Z",
-                "end": slot_end.isoformat() + "Z",
-                "display": format_slot(slot_start.isoformat() + "Z", slot_end.isoformat() + "Z", timezone)
-            })
-        slot_start += timedelta(minutes=30)
+        while slot_start < end and len(all_slots) < num_slots:
+            slot_end = slot_start + timedelta(minutes=duration_minutes)
+            overlap = any(
+                slot_start < datetime.fromisoformat(b["end"].replace("Z", "+00:00")) and
+                slot_end > datetime.fromisoformat(b["start"].replace("Z", "+00:00"))
+                for b in busy_times
+            )
+            if not overlap and 9 <= slot_start.hour < 18:
+                all_slots.append({
+                    "start": slot_start.isoformat() + "Z",
+                    "end": slot_end.isoformat() + "Z",
+                    "display": format_slot(slot_start.isoformat() + "Z", slot_end.isoformat() + "Z", timezone)
+                })
+            slot_start += timedelta(minutes=30)
 
-    return all_slots
+        return all_slots
+    except Exception as e:
+        print("❌ Error in find_free_slots:", e)
+        raise
 
 def create_event(access_token, summary, start_time, end_time, timezone="Asia/Kolkata"):
     service = get_calendar_service(access_token)
@@ -60,5 +64,9 @@ def create_event(access_token, summary, start_time, end_time, timezone="Asia/Kol
         "start": {"dateTime": start_time, "timeZone": timezone},
         "end": {"dateTime": end_time, "timeZone": timezone},
     }
-    created_event = service.events().insert(calendarId="primary", body=event).execute()
-    return created_event.get("htmlLink")
+    try:
+        created_event = service.events().insert(calendarId="primary", body=event).execute()
+        return created_event.get("htmlLink")
+    except Exception as e:
+        print("❌ Error in create_event:", e)
+        raise
