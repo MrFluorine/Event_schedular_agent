@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from typing import List, Optional
 import base64
 from utils.tts import synthesize_audio
-
 from services.llm_agent import chat_with_gemini
 
 router = APIRouter()
