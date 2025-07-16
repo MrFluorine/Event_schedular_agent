@@ -63,7 +63,9 @@ The Smart Scheduler AI Agent is a voice-enabled conversational assistant that he
 
 4. **Configure environment variables**
 
-   Create a `.env` file in the root directory with the following variables:
+   Create two `.env` files: one in the `backend` directory and another in the `frontend` directory.
+
+   **Backend `.env`:**
    ```env
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_CLIENT_SECRET=your_google_client_secret
@@ -71,6 +73,12 @@ The Smart Scheduler AI Agent is a voice-enabled conversational assistant that he
    SCOPES=https://www.googleapis.com/auth/calendar
    GEMINI_API_KEY=your_gemini_key
    OPENAI_API_KEY=your_openai_key
+   ```
+
+   **Frontend `.env`:**
+   ```env
+   VITE_GOOGLE_CLIENT_ID=your_google_client_id
+   VITE_REDIRECT_URI=http://localhost:5173/login
    ```
 
 5. **Run the application**
