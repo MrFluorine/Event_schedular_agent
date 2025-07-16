@@ -17,7 +17,8 @@ const Home = () => {
     setMessages((prev) => [...prev, userMsg]);
 
     try {
-      const res = await sendMessage(text, history, true);
+      const token = localStorage.getItem("access_token");
+      const res = await sendMessage(text, history, true, token);
       const botMsg = {
         sender: "assistant",
         message: res.reply,

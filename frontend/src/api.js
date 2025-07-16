@@ -1,12 +1,10 @@
-
-
 const BASE_URL = "http://localhost:8000";
 
-export async function sendMessage(user_input, history = [], voice = false) {
+export async function sendMessage(user_input, history = [], voice = false, access_token) {
   const res = await fetch(`${BASE_URL}/reply`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_input, history, voice }),
+    body: JSON.stringify({ user_input, history, voice, access_token }),
   });
   if (!res.ok) throw new Error("Failed to send message");
   return res.json();

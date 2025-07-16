@@ -1,6 +1,4 @@
-
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 function Header({ user: propUser }) {
   const [user, setUser] = useState(propUser);
@@ -18,6 +16,8 @@ function Header({ user: propUser }) {
     }
   }, [propUser]);
 
+  const memoizedPicture = useMemo(() => user?.picture, [user?.picture]);
+
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/login";
@@ -29,8 +29,13 @@ function Header({ user: propUser }) {
       {user && (
         <div className="flex items-center gap-3">
           <img
-            src={user.picture}
+            src={memoizedPicture}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/default-avatar.png";
+            }}
             alt="User"
+            loading="lazy"
             className="w-8 h-8 rounded-full object-cover"
           />
           <span className="font-medium">{user.name}</span>
