@@ -11,6 +11,7 @@ class ChatRequest(BaseModel):
     user_input: str
     history: Optional[List[str]] = []
     voice: Optional[bool] = False
+    access_token: str
 
 class ChatResponse(BaseModel):
     reply: str
@@ -22,7 +23,8 @@ async def reply(request: ChatRequest):
     try:
         reply_text, updated_history = chat_with_gemini(
             user_input=request.user_input,
-            history=request.history
+            history=request.history,
+            access_token=request.access_token
         )
         audio_data = None
         if request.voice:

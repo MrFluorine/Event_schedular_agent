@@ -42,7 +42,7 @@ function Login() {
           setLoading(false);
           return;
         }
-        console.log("🌐 Fetching from:", `${BACKEND_URL}/api/exchange-code`);
+
         const res = await fetch(`${BACKEND_URL}/api/exchange-code`, {
           method: 'POST',
           headers: {
@@ -50,8 +50,9 @@ function Login() {
           },
           body: JSON.stringify({ code }),
         });
+
         const data = await res.json();
-        console.log("🔁 Exchange response:", data);
+
         if (res.ok) {
           localStorage.setItem('user', JSON.stringify(data.user));
           localStorage.setItem('access_token', data.access_token);
