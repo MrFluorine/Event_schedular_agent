@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "https://event-schedular-agent-98441850389.asia-south1.run.app";
 
 export async function sendMessage(user_input, history = [], voice = false, access_token) {
   const res = await fetch(`${BASE_URL}/reply`, {
