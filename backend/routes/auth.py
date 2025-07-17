@@ -11,7 +11,7 @@ class CodePayload(BaseModel):
 
 @router.post("/exchange-code")
 def exchange_code(payload: CodePayload):
-    print("🔁 Received code:", payload.code)
+    # print("🔁 Received code:", payload.code)
     data = {
         "code": payload.code,
         "client_id": os.getenv("GOOGLE_CLIENT_ID"),
@@ -25,7 +25,7 @@ def exchange_code(payload: CodePayload):
         raise HTTPException(status_code=400, detail=token_res.json())
 
     tokens = token_res.json()
-    print("🔐 Token response:", tokens)
+    # print("🔐 Token response:", tokens)
     access_token = tokens.get("access_token")
 
     if not access_token:
