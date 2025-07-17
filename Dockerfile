@@ -1,6 +1,6 @@
 # Dockerfile
 FROM python:3.10-slim
-
+#ok
 WORKDIR /app
 
 COPY ./backend/requirements.txt .
