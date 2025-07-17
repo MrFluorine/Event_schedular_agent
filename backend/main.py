@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-
+import uvicorn
 from routes.chat import router as chat_router
 from routes.calendar import router as calendar_router
 from routes.transcribe import router as transcribe_router
@@ -30,5 +30,4 @@ app.include_router(auth_router, prefix="/api")
 def read_root():
     return {"message": "Smart Scheduler backend is running."}
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8080)
