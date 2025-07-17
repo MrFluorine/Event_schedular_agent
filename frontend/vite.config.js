@@ -37,7 +37,7 @@ export default defineConfig({
     strictPort: true, // Exit if port is already in use
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'https://event-schedular-agent-98441850389.asia-south1.run.app',
         changeOrigin: true,
         secure: false,
         // Add timeout for better error handling
@@ -162,9 +162,12 @@ export default defineConfig({
   },
 
   // Preview server configuration (for production builds)
+  server: {
+    host: '0.0.0.0',
+    port: 8080
+  },
   preview: {
-    port: 4173,
-    host: true,
-    strictPort: true
+    host: '0.0.0.0',
+    port: 8080
   }
 })
