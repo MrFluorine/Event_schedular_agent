@@ -6,7 +6,7 @@ from routes.chat import router as chat_router
 from routes.calendar import router as calendar_router
 from routes.transcribe import router as transcribe_router
 from routes.auth import router as auth_router
-
+import os
 load_dotenv()
 
 app = FastAPI()
@@ -14,7 +14,7 @@ app = FastAPI()
 # Allow frontend to connect (adjust origin for production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["https://smart-acheduler-agent-98441850389.asia-south1.run.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -32,8 +32,8 @@ export default defineConfig({
 
   // Development server configuration
   server: {
-    port: 5173,
-    host: true, // Allow external connections
+    port: 8080,
+    host:'0.0.0.0', // Allow external connections
     strictPort: true, // Exit if port is already in use
     proxy: {
       '/api': {
@@ -162,10 +162,7 @@ export default defineConfig({
   },
 
   // Preview server configuration (for production builds)
-  server: {
-    host: '0.0.0.0',
-    port: 8080
-  },
+
   preview: {
     host: '0.0.0.0',
     port: 8080
