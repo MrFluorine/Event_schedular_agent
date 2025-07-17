@@ -2,7 +2,8 @@ streamlit
 python-dotenv
 requests
 openai
-uvicorn
+fastapi
+uvicorn[standard]
 # audio-recorder-streamlit # Google OAuth & Calendar
 google-auth
 google-auth-oauthlib

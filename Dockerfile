@@ -1,11 +1,16 @@
-# Dockerfile
 FROM python:3.10-slim
-#ok
+
 WORKDIR /app
 
-COPY ./backend/requirements.txt .
+# Copy requirements first for better layer caching
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./backend ./backend
+# Copy the entire backend directory
+COPY backend/ .
 
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Expose port 8080
+EXPOSE 8080
+
+# Run the application - note the path change
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

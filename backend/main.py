@@ -30,4 +30,5 @@ app.include_router(auth_router, prefix="/api")
 def read_root():
     return {"message": "Smart Scheduler backend is running."}
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
