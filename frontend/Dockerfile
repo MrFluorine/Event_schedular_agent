@@ -3,18 +3,15 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies including terser
-RUN npm install \
-    && npm install --save-dev terser
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+RUN rm -rf node_modules dist package-lock.json \
+    && npm install \
+    && npm install --save-dev terser \
+    && npm run build
+
 
 # Use nginx to serve the built app
 FROM nginx:alpine

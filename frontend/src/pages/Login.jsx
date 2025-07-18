@@ -6,7 +6,8 @@ if (!BACKEND_URL) {
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_OAUTH_REDIRECT_URI;
 const SCOPE = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile";
-
+console.log((`🔗 Using Redirect URI: ${REDIRECT_URI}`));
+console.log((`🔗 Using Backend URL ${BACKEND_URL}`));
 function Login() {
   const [loading, setLoading] = useState(false);
   const hasRun = useRef(false); // Initialize useRef
