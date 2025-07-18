@@ -130,6 +130,9 @@ function Login() {
     }
   }, []);
 
+  // Check if all required config is present
+  const isConfigured = BACKEND_URL && CLIENT_ID && REDIRECT_URI;
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
@@ -143,26 +146,27 @@ function Login() {
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
       <h1 className="text-3xl font-bold mb-4">🧠 Smart Scheduler</h1>
       
-      {/* Debug information - you can remove this after confirming it works */}
-      <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-md">
-        <h3 className="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
-        <div className="text-xs text-yellow-700 space-y-1">
-          <div>Backend: {debugInfo.backendUrl || 'NOT SET'}</div>
-          <div>Client ID: {debugInfo.clientId ? '✓ SET' : '❌ NOT SET'}</div>
-          <div>Redirect URI: {debugInfo.redirectUri || 'NOT SET'}</div>
-          <div>Current URL: {debugInfo.currentUrl}</div>
+      {/* Only show debug info when configuration is incomplete */}
+      {!isConfigured && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg max-w-md">
+          <h3 className="font-semibold text-red-800 mb-2">Configuration Error:</h3>
+          <div className="text-xs text-red-700 space-y-1">
+            <div>Backend: {BACKEND_URL ? '✓ Connected' : '❌ NOT SET'}</div>
+            <div>Client ID: {CLIENT_ID ? '✓ Configured' : '❌ NOT SET'}</div>
+            <div>Redirect URI: {REDIRECT_URI ? '✓ Set' : '❌ NOT SET'}</div>
+          </div>
         </div>
-      </div>
+      )}
       
       <button
         onClick={handleLogin}
-        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-        disabled={!CLIENT_ID || !REDIRECT_URI}
+        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        disabled={!isConfigured}
       >
         Sign in with Google
       </button>
       
-      {(!CLIENT_ID || !REDIRECT_URI) && (
+      {!isConfigured && (
         <p className="text-red-500 text-sm mt-2">
           OAuth configuration incomplete. Check environment variables.
         </p>
