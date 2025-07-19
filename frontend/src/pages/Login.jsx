@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Added import
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_OAUTH_REDIRECT_URI;
 const SCOPE = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile";
 
-function Login() {
+function Login({ setUser }) { // ✅ Accept setUser prop
   const [loading, setLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState({});
   const hasRun = useRef(false);
+  const navigate = useNavigate(); // ✅ Added navigate hook
 
   // Debug environment variables on component mount
   useEffect(() => {
@@ -105,20 +107,27 @@ function Login() {
         });
 
         const data = await res.json();
-        console.log("📊 Token exchange response:", { status: res.status, ok: res.ok });
+        console.log("📊 Token exchange response:", { status: res.status, ok: res.ok, data });
 
         if (res.ok) {
           console.log("✅ Token exchange successful");
           localStorage.setItem('user', JSON.stringify(data.user));
           localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('loggedIn', 'true');
-          window.location.href = '/';
+          
+          // ✅ Update the user state in App component
+          setUser(data.user);
+          
+          // ✅ Navigate to home page using React Router
+          navigate('/', { replace: true });
         } else {
           console.error('❌ Failed to exchange code:', data);
+          alert(`Login failed: ${data.message || 'Unknown error'}`);
           setLoading(false);
         }
       } catch (error) {
         console.error('🚨 Error exchanging code:', error);
+        alert(`Login error: ${error.message}`);
         setLoading(false);
       }
     };
@@ -127,8 +136,9 @@ function Login() {
       exchangeCodeForToken();
     } else {
       console.log("🧭 No code in URL or already logged in.");
+      setLoading(false);
     }
-  }, []);
+  }, [setUser, navigate]); // ✅ Added dependencies
 
   // Check if all required config is present
   const isConfigured = BACKEND_URL && CLIENT_ID && REDIRECT_URI;
@@ -136,8 +146,11 @@ function Login() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-        <h2 className="text-xl font-semibold">Loading...</h2>
-        <p className="text-sm text-gray-600 mt-2">Exchanging authorization code...</p>
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold">Processing Login...</h2>
+          <p className="text-sm text-gray-600 mt-2">Exchanging authorization code...</p>
+        </div>
       </div>
     );
   }
