@@ -14,7 +14,7 @@ app = FastAPI()
 # Allow frontend to connect (adjust origin for production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://smart-acheduler-agent-98441850389.asia-south1.run.app", "http://localhost:5173"],
+    allow_origins=["https://event-schedular-agent.vercel.app", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -7,7 +7,7 @@ from urllib.parse import urlencode
 
 CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("OAUTH_REDIRECT_URI", "https://smart-acheduler-agent-98441850389.asia-south1.run.app/login")
+REDIRECT_URI = os.getenv("OAUTH_REDIRECT_URI", "https://event-schedular-agent.vercel.app/login")
 SCOPES = os.getenv("SCOPES", "https://www.googleapis.com/auth/calendar").split(",")
 
 AUTH_URL = "https://accounts.google.com/o/oauth2/auth"
