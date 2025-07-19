@@ -7,12 +7,12 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy requirements first for better layer caching
-COPY backend/requirements.txt .
+# Copy requirements file (relative to Docker build context)
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire backend directory
-COPY backend/ .
+# Copy all contents from backend directory (current dir during build)
+COPY . .
 
 # Expose port 8080
 EXPOSE 8080
