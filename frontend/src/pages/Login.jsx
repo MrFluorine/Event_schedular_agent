@@ -1,50 +1,30 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Added import
+import { useNavigate } from "react-router-dom";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_OAUTH_REDIRECT_URI;
 const SCOPE = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile";
 
-function Login({ setUser }) { // ✅ Accept setUser prop
+function Login({ setUser }) {
   const [loading, setLoading] = useState(false);
-  const [debugInfo, setDebugInfo] = useState({});
+  const [error, setError] = useState(null);
   const hasRun = useRef(false);
-  const navigate = useNavigate(); // ✅ Added navigate hook
+  const navigate = useNavigate();
 
-  // Debug environment variables on component mount
+  // Debug environment variables
   useEffect(() => {
-    const debug = {
-      backendUrl: BACKEND_URL,
-      clientId: CLIENT_ID,
-      redirectUri: REDIRECT_URI,
-      currentUrl: window.location.href,
-      origin: window.location.origin,
-      hostname: window.location.hostname
-    };
-    
-    setDebugInfo(debug);
-    console.log("🔍 Debug Info:", debug);
-    
-    // Check for missing environment variables
-    if (!BACKEND_URL) {
-      console.error("❌ VITE_BACKEND_URL is undefined!");
-    }
-    if (!CLIENT_ID) {
-      console.error("❌ VITE_GOOGLE_CLIENT_ID is undefined!");
-    }
-    if (!REDIRECT_URI) {
-      console.error("❌ VITE_OAUTH_REDIRECT_URI is undefined!");
-    }
+    console.log("🔍 Login Component Environment Check:", {
+      BACKEND_URL: BACKEND_URL || 'MISSING',
+      CLIENT_ID: CLIENT_ID ? 'SET' : 'MISSING',
+      REDIRECT_URI: REDIRECT_URI || 'MISSING',
+      currentURL: window.location.href
+    });
   }, []);
 
   const handleLogin = () => {
-    console.log("🚀 Starting OAuth flow...");
-    
-    // Validate environment variables before proceeding
     if (!CLIENT_ID || !REDIRECT_URI) {
-      console.error("❌ Missing required environment variables for OAuth");
-      alert("OAuth configuration error. Please check environment variables.");
+      setError("OAuth configuration missing. Check environment variables.");
       return;
     }
 
@@ -54,51 +34,51 @@ function Login({ setUser }) { // ✅ Accept setUser prop
       `&response_type=code` +
       `&scope=${encodeURIComponent(SCOPE)}` +
       `&access_type=offline` +
-      `&prompt=consent` +
-      `&include_granted_scopes=true`;
+      `&prompt=consent`;
 
-    console.log("🔗 OAuth URL:", authUrl);
-    console.log("🔗 Redirect URI being used:", REDIRECT_URI);
-    
+    console.log("🚀 Redirecting to OAuth:", authUrl);
     window.location.href = authUrl;
   };
 
   useEffect(() => {
-    if (hasRun.current) {
-      return;
-    }
+    if (hasRun.current) return;
     hasRun.current = true;
 
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    const error = params.get("error");
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    const error = urlParams.get("error");
 
-    console.log("📍 URL params:", { code, error });
+    console.log("📍 Login page loaded with params:", { 
+      code: code ? `${code.substring(0, 10)}...` : null, 
+      error,
+      fullURL: window.location.href 
+    });
 
     if (error) {
       console.error("❌ OAuth error:", error);
-      setLoading(false);
+      setError(`OAuth error: ${error}`);
       return;
     }
 
+    if (!code) {
+      console.log("ℹ️ No authorization code found. Showing login form.");
+      return;
+    }
+
+    // We have a code, attempt token exchange
     const exchangeCodeForToken = async () => {
       try {
         setLoading(true);
-        console.log("🔄 Exchanging code for token...");
-        
-        if (!code) {
-          console.log('ℹ️ No code found in URL.');
-          setLoading(false);
-          return;
-        }
+        setError(null);
+        console.log("🔄 Starting token exchange...");
 
         if (!BACKEND_URL) {
-          console.error("❌ Backend URL not configured");
-          setLoading(false);
-          return;
+          throw new Error("Backend URL not configured");
         }
 
-        const res = await fetch(`${BACKEND_URL}/api/exchange-code`, {
+        console.log("📡 Making request to:", `${BACKEND_URL}/api/exchange-code`);
+        
+        const response = await fetch(`${BACKEND_URL}/api/exchange-code`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -106,41 +86,45 @@ function Login({ setUser }) { // ✅ Accept setUser prop
           body: JSON.stringify({ code }),
         });
 
-        const data = await res.json();
-        console.log("📊 Token exchange response:", { status: res.status, ok: res.ok, data });
+        console.log("📊 Response status:", response.status, response.ok);
+        
+        const data = await response.json();
+        console.log("📦 Response data:", data);
 
-        if (res.ok) {
-          console.log("✅ Token exchange successful");
-          localStorage.setItem('user', JSON.stringify(data.user));
-          localStorage.setItem('access_token', data.access_token);
-          localStorage.setItem('loggedIn', 'true');
-          
-          // ✅ Update the user state in App component
-          setUser(data.user);
-          
-          // ✅ Navigate to home page using React Router
-          navigate('/', { replace: true });
-        } else {
-          console.error('❌ Failed to exchange code:', data);
-          alert(`Login failed: ${data.message || 'Unknown error'}`);
-          setLoading(false);
+        if (!response.ok) {
+          throw new Error(data.message || `HTTP ${response.status}`);
         }
-      } catch (error) {
-        console.error('🚨 Error exchanging code:', error);
-        alert(`Login error: ${error.message}`);
+
+        console.log("✅ Token exchange successful!");
+        
+        // Store authentication data
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('loggedIn', 'true');
+        
+        console.log("💾 Data stored in localStorage");
+        
+        // Update app state
+        console.log("🔄 Updating app state with user:", data.user);
+        setUser(data.user);
+        
+        // Clean URL and navigate
+        console.log("🧭 Navigating to home page...");
+        navigate('/', { replace: true });
+        
+      } catch (err) {
+        console.error('🚨 Token exchange failed:', err);
+        setError(`Login failed: ${err.message}`);
         setLoading(false);
+        
+        // Clear URL params on error
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
 
-    if (code && !localStorage.getItem('loggedIn')) {
-      exchangeCodeForToken();
-    } else {
-      console.log("🧭 No code in URL or already logged in.");
-      setLoading(false);
-    }
-  }, [setUser, navigate]); // ✅ Added dependencies
+    exchangeCodeForToken();
+  }, [setUser, navigate]);
 
-  // Check if all required config is present
   const isConfigured = BACKEND_URL && CLIENT_ID && REDIRECT_URI;
 
   if (loading) {
@@ -159,14 +143,20 @@ function Login({ setUser }) { // ✅ Accept setUser prop
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
       <h1 className="text-3xl font-bold mb-4">🧠 Smart Scheduler</h1>
       
-      {/* Only show debug info when configuration is incomplete */}
-      {!isConfigured && (
+      {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg max-w-md">
-          <h3 className="font-semibold text-red-800 mb-2">Configuration Error:</h3>
-          <div className="text-xs text-red-700 space-y-1">
-            <div>Backend: {BACKEND_URL ? '✓ Connected' : '❌ NOT SET'}</div>
-            <div>Client ID: {CLIENT_ID ? '✓ Configured' : '❌ NOT SET'}</div>
-            <div>Redirect URI: {REDIRECT_URI ? '✓ Set' : '❌ NOT SET'}</div>
+          <h3 className="font-semibold text-red-800 mb-2">Error:</h3>
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
+      
+      {!isConfigured && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-md">
+          <h3 className="font-semibold text-yellow-800 mb-2">Configuration Status:</h3>
+          <div className="text-xs text-yellow-700 space-y-1">
+            <div>Backend: {BACKEND_URL ? '✓ Set' : '❌ Missing'}</div>
+            <div>Client ID: {CLIENT_ID ? '✓ Set' : '❌ Missing'}</div>
+            <div>Redirect URI: {REDIRECT_URI ? '✓ Set' : '❌ Missing'}</div>
           </div>
         </div>
       )}
@@ -178,12 +168,6 @@ function Login({ setUser }) { // ✅ Accept setUser prop
       >
         Sign in with Google
       </button>
-      
-      {!isConfigured && (
-        <p className="text-red-500 text-sm mt-2">
-          OAuth configuration incomplete. Check environment variables.
-        </p>
-      )}
     </div>
   );
 }

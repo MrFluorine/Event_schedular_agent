@@ -64,30 +64,53 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Debug user state changes
+  useEffect(() => {
+    console.log("🔍 App user state changed:", {
+      user: user ? 'SET' : 'NULL',
+      userDetails: user,
+      localStorage: {
+        user: localStorage.getItem('user') ? 'SET' : 'NULL',
+        loggedIn: localStorage.getItem('loggedIn'),
+        accessToken: localStorage.getItem('access_token') ? 'SET' : 'NULL'
+      }
+    });
+  }, [user]);
+
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        console.log("🚀 Initializing app...");
+        
         // Simulate a brief loading time for smooth UX
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        const stored = localStorage.getItem("user");
-        if (stored) {
+        const storedUser = localStorage.getItem("user");
+        const isLoggedIn = localStorage.getItem("loggedIn");
+        const accessToken = localStorage.getItem("access_token");
+        
+        console.log("💾 Checking stored data:", {
+          storedUser: storedUser ? 'Found' : 'Not found',
+          isLoggedIn,
+          accessToken: accessToken ? 'Found' : 'Not found'
+        });
+        
+        if (storedUser && isLoggedIn === 'true') {
           try {
-            const parsed = JSON.parse(stored);
+            const parsed = JSON.parse(storedUser);
             console.log("✅ User loaded from localStorage:", parsed);
             setUser(parsed);
           } catch (e) {
-            console.error("❌ Failed to parse user data from localStorage");
-            localStorage.removeItem("user"); // Clean up corrupted data
+            console.error("❌ Failed to parse user data from localStorage:", e);
+            localStorage.removeItem("user");
+            localStorage.removeItem("loggedIn");
+            localStorage.removeItem("access_token");
           }
-        } else if (localStorage.getItem("loggedIn")) {
-          console.log("⚠️ No user, but loggedIn flag found");
-          setUser({});
         } else {
-          console.log("🔒 No login state found");
+          console.log("🔒 No valid login state found");
         }
       } catch (error) {
-        console.error("Failed to initialize app:", error);
+        console.error("❌ Failed to initialize app:", error);
       } finally {
         setLoading(false);
       }
@@ -95,6 +118,21 @@ function App() {
 
     initializeApp();
   }, []);
+
+  // Function to update user state (called from Login component)
+  const updateUser = (userData) => {
+    console.log("🔄 Updating user state with:", userData);
+    setUser(userData);
+  };
+
+  // Function to clear user state (for logout)
+  const clearUser = () => {
+    console.log("🚪 Clearing user state");
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("loggedIn");
+    localStorage.removeItem("access_token");
+  };
 
   if (loading) {
     return <LoadingSpinner />;
@@ -104,14 +142,29 @@ function App() {
     <ErrorBoundary>
       <Router>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-          <Header user={user} />
+          {/* Always show Header, pass user data */}
+          <Header user={user} onLogout={clearUser} />
+          
           <main className="relative">
             <Routes>
-              <Route path="/login" element={<Login setUser={setUser} />} />
+              <Route 
+                path="/login" 
+                element={
+                  user ? (
+                    <Navigate to="/" replace />
+                  ) : (
+                    <Login setUser={updateUser} />
+                  )
+                } 
+              />
               <Route
                 path="/"
                 element={
-                  user ? <Home user={user} /> : <Navigate to="/login" replace />
+                  user ? (
+                    <Home user={user} />
+                  ) : (
+                    <Navigate to="/login" replace />
+                  )
                 }
               />
               <Route
