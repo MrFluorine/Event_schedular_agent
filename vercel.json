@@ -14,9 +14,9 @@
       "dest": "/frontend/dist/$1"
     }
   ],
-  {
+  
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
-}
+
 }
