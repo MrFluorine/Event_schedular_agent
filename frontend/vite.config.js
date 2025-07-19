@@ -32,7 +32,7 @@ export default defineConfig({
 
   // Development server configuration
   server: {
-    port: 8080,
+    port: 5173,
     host:'0.0.0.0', // Allow external connections
     strictPort: true, // Exit if port is already in use
     proxy: {
@@ -165,6 +165,6 @@ export default defineConfig({
 
   preview: {
     host: '0.0.0.0',
-    port: 8080
+    port: 5173
   }
 })
